@@ -10,7 +10,9 @@ export const createBook = async (req: any, res: Response) => {
     // If a file was uploaded, store its URL
     let image_url = "";
     if (req.file) {
-      image_url = `http://127.0.0.1:5000/uploads/${req.file.filename}`;
+      const host = req.get("host");
+      const protocol = req.protocol;
+      image_url = `${protocol}://${host}/uploads/${req.file.filename}`;
     }
 
     const book = await Book.create({

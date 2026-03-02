@@ -32,15 +32,32 @@ app.use((req, res, next) => {
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI && process.env.NODE_ENV === "production") {
-  console.error("❌ MONGO_URI is not defined in environment variables!");
+if (!MONGO_URI) {
+  console.error("❌ MONGO_URI is MISSING in environment variables!");
+} else {
+  console.log(`📡 Attempting to connect to MongoDB... (URI length: ${MONGO_URI.length})`);
+  // Log a masked version of the URI for debugging
+  const maskedUri = MONGO_URI.replace(/:([^@]+)@/, ":****@");
+  console.log(`🔗 Target: ${maskedUri}`);
 }
 
-mongoose.connect(MONGO_URI || "mongodb://localhost:27017/bookswap")
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-  });
+mongoose.connection.on("connected", () => console.log("✅ Mongoose connected to DB"));
+mongoose.connection.on("error", (err) => console.error("❌ Mongoose connection error:", err));
+mongoose.connection.on("disconnected", () => console.log("ℹ️ Mongoose disconnected"));
+
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState >= 1) return;
+    await mongoose.connect(MONGO_URI || "mongodb://localhost:27017/bookswap", {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    });
+  } catch (err) {
+    console.error("❌ Initial MongoDB Connection Error:", err);
+  }
+};
+
+// Call connection
+connectDB();
 
 // Routes
 app.use("/api/auth", authRoutes);
