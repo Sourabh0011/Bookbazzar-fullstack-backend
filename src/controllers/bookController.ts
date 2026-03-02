@@ -34,12 +34,24 @@ export const createBook = async (req: any, res: Response) => {
   }
 };
 
+// Helper to fix image URLs
+const fixImageUrl = (req: any, book: any) => {
+  if (book.image_url && book.image_url.includes("127.0.0.1")) {
+    const filename = book.image_url.split("/").pop();
+    const host = req.get("host");
+    const protocol = req.protocol === "https" || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    book.image_url = `${protocol}://${host}/uploads/${filename}`;
+  }
+  return book;
+};
+
 // @desc    Get all books
 // @route   GET /api/books
 export const getBooks = async (req: Request, res: Response) => {
   try {
     const books = await Book.find().populate("user", "username avatar_url").sort("-created_at");
-    res.json(books);
+    const fixedBooks = books.map(book => fixImageUrl(req, book.toObject()));
+    res.json(fixedBooks);
   } catch (error: any) {
     res.status(500).json({ message: "Error fetching books", error: error.message });
   }
@@ -50,7 +62,8 @@ export const getBooks = async (req: Request, res: Response) => {
 export const getMyBooks = async (req: any, res: Response) => {
   try {
     const books = await Book.find({ user: req.user._id }).sort("-created_at");
-    res.json(books);
+    const fixedBooks = books.map(book => fixImageUrl(req, book.toObject()));
+    res.json(fixedBooks);
   } catch (error: any) {
     res.status(500).json({ message: "Error fetching your books", error: error.message });
   }
