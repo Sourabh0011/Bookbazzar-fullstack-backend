@@ -31,5 +31,9 @@
     "strict": true,
     "jsx": "react-jsx",
     "moduleDetection": "force"
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   }
 }
