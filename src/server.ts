@@ -78,6 +78,14 @@ app.use("/api/books", bookRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
 
+// Info route for /api
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Book Swap API is running! 📚",
+    endpoints: ["/api/auth", "/api/books", "/api/transactions", "/api/notifications"]
+  });
+});
+
 app.get("/", (req, res) => {
   const states = ["Disconnected", "Connected", "Connecting", "Disconnecting"];
   const readyState = mongoose.connection.readyState;
@@ -102,6 +110,15 @@ app.get("/", (req, res) => {
       </p>
     </div>
   `);
+});
+
+// Custom 404 for any other unmatched routes
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Endpoint not found",
+    path: req.originalUrl || req.url,
+    message: "Please check your URL or API documentation."
+  });
 });
 
 // Conditionally listen only if not in production environment (like Vercel)
