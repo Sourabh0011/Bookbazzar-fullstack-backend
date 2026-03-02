@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
-import authRoutes from "./routes/authRoutes";
-import bookRoutes from "./routes/bookRoutes";
-import transactionRoutes from "./routes/transactionRoutes";
-import notificationRoutes from "./routes/notificationRoutes";
+import authRoutes from "./routes/authRoutes.js";
+import bookRoutes from "./routes/bookRoutes.js";
+import transactionRoutes from "./routes/transactionRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
