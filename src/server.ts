@@ -79,11 +79,28 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.get("/", (req, res) => {
-  const status = mongoose.connection.readyState === 1 ? "Connected ✅" : "Disconnected ❌";
+  const states = ["Disconnected", "Connected", "Connecting", "Disconnecting"];
+  const readyState = mongoose.connection.readyState;
+  const status = states[readyState] || "Unknown";
+  const icon = readyState === 1 ? "✅" : "❌";
+  
+  const uriExists = !!process.env.MONGO_URI;
+  const uriLength = process.env.MONGO_URI ? process.env.MONGO_URI.length : 0;
+
   res.send(`
-    <h1>Book Swap Backend is running! 🚀</h1>
-    <p>Database Status: <strong>${status}</strong></p>
-    <p>Environment: <strong>${process.env.NODE_ENV}</strong></p>
+    <div style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
+      <h1 style="color: #2563eb;">Book Swap Backend is running! 🚀</h1>
+      <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <p>Database Status: <strong>${status} ${icon}</strong> (Code: ${readyState})</p>
+        <p>Environment: <strong>${process.env.NODE_ENV}</strong></p>
+        <hr style="border: 0; border-top: 1px solid #d1d5db; margin: 15px 0;">
+        <p>MONGO_URI Detected: <strong>${uriExists ? "Yes (Safe Check)" : "No ⚠️"}</strong></p>
+        <p>MONGO_URI Length: <strong>${uriLength} characters</strong></p>
+      </div>
+      <p style="margin-top: 20px; color: #6b7280; font-size: 0.9em;">
+        Try <a href="/api/books">/api/books</a> to test data fetching.
+      </p>
+    </div>
   `);
 });
 
