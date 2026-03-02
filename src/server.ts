@@ -40,7 +40,6 @@ mongoose.connect(MONGO_URI || "mongodb://localhost:27017/bookswap")
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:", err);
-    // In serverless, we might want to log more details
   });
 
 // Routes
