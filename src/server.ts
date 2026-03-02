@@ -59,6 +59,19 @@ const connectDB = async () => {
 // Call connection
 connectDB();
 
+// Middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+  try {
+    if (mongoose.connection.readyState === 0) {
+      console.log("🔄 Re-connecting to MongoDB...");
+      await connectDB();
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
@@ -66,7 +79,12 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Book Swap Backend is running! 🚀");
+  const status = mongoose.connection.readyState === 1 ? "Connected ✅" : "Disconnected ❌";
+  res.send(`
+    <h1>Book Swap Backend is running! 🚀</h1>
+    <p>Database Status: <strong>${status}</strong></p>
+    <p>Environment: <strong>${process.env.NODE_ENV}</strong></p>
+  `);
 });
 
 // Conditionally listen only if not in production environment (like Vercel)
