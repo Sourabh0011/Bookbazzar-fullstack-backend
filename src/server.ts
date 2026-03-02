@@ -3,12 +3,16 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,11 +30,18 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/bookswap";
+const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
+if (!MONGO_URI && process.env.NODE_ENV === "production") {
+  console.error("❌ MONGO_URI is not defined in environment variables!");
+}
+
+mongoose.connect(MONGO_URI || "mongodb://localhost:27017/bookswap")
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+    // In serverless, we might want to log more details
+  });
 
 // Routes
 app.use("/api/auth", authRoutes);
