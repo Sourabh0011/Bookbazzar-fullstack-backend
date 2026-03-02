@@ -1,5 +1,5 @@
 import { Response } from "express";
-import Notification from "../models/Notification.js";
+import Notification from "../models/Notification";
 
 // @desc    Get user notifications
 // @route   GET /api/notifications
