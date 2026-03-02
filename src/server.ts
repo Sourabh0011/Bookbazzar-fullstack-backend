@@ -32,38 +32,33 @@ app.use((req, res, next) => {
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) {
-  console.error("❌ MONGO_URI is MISSING in environment variables!");
-} else {
-  console.log(`📡 Attempting to connect to MongoDB... (URI length: ${MONGO_URI.length})`);
-  // Log a masked version of the URI for debugging
-  const maskedUri = MONGO_URI.replace(/:([^@]+)@/, ":****@");
-  console.log(`🔗 Target: ${maskedUri}`);
-}
-
-mongoose.connection.on("connected", () => console.log("✅ Mongoose connected to DB"));
-mongoose.connection.on("error", (err) => console.error("❌ Mongoose connection error:", err));
-mongoose.connection.on("disconnected", () => console.log("ℹ️ Mongoose disconnected"));
+// Masked URI for safe logging
+const maskedUri = MONGO_URI ? MONGO_URI.replace(/:([^@]+)@/, ":****@") : "MISSING";
 
 const connectDB = async () => {
   try {
-    if (mongoose.connection.readyState >= 1) return;
+    if (mongoose.connection.readyState >= 1) {
+      console.log("✅ Using existing MongoDB connection");
+      return;
+    }
+    
+    console.log(`📡 New DB connection attempt... Target: ${maskedUri}`);
     await mongoose.connect(MONGO_URI || "mongodb://localhost:27017/bookswap", {
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      serverSelectionTimeoutMS: 5000,
     });
+    console.log("✅ Successfully connected to MongoDB");
   } catch (err) {
     console.error("❌ Initial MongoDB Connection Error:", err);
   }
 };
 
-// Call connection
+// Initial connection for server startup
 connectDB();
 
-// Middleware to ensure DB is connected
+// Middleware to ensure DB is connected per request (needed for Vercel serverless)
 app.use(async (req, res, next) => {
   try {
     if (mongoose.connection.readyState === 0) {
-      console.log("🔄 Re-connecting to MongoDB...");
       await connectDB();
     }
     next();
