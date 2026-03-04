@@ -23,15 +23,15 @@ export const createTransaction = async (req: any, res: Response) => {
       state,
       pincode,
       phone,
-    });
+    } as any);
 
     // Create Notification for Seller
     await Notification.create({
       user: sellerId,
       title: "New Order Received! 🎉",
       message: `Someone wants to buy "${book.title}" for ₹${book.price}. Payment: ${paymentMethod === "cash" ? "Cash on Delivery" : "Online Payment"}.`,
-      related_transaction: transaction._id,
-    });
+      related_transaction: (transaction._id as any),
+    } as any);
 
     res.status(201).json(transaction);
   } catch (error: any) {

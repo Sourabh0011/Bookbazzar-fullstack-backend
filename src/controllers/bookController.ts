@@ -23,7 +23,7 @@ export const createBook = async (req: any, res: Response) => {
       category,
       description,
       image_url,
-    });
+    } as any);
 
     res.status(201).json(book);
   } catch (error: any) {
