@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Book from "../models/Book.js";
+import Book from "../models/Book";
 
 // @desc    Create a new book listing
 // @route   POST /api/books
@@ -10,9 +10,7 @@ export const createBook = async (req: any, res: Response) => {
     // If a file was uploaded, store its URL
     let image_url = "";
     if (req.file) {
-      const host = req.get("host");
-      const protocol = req.protocol;
-      image_url = `${protocol}://${host}/uploads/${req.file.filename}`;
+      image_url = `http://127.0.0.1:5000/uploads/${req.file.filename}`;
     }
 
     const book = await Book.create({
@@ -34,24 +32,12 @@ export const createBook = async (req: any, res: Response) => {
   }
 };
 
-// Helper to fix image URLs
-const fixImageUrl = (req: any, book: any) => {
-  if (book.image_url && book.image_url.includes("127.0.0.1")) {
-    const filename = book.image_url.split("/").pop();
-    const host = req.get("host");
-    const protocol = req.protocol === "https" || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-    book.image_url = `${protocol}://${host}/uploads/${filename}`;
-  }
-  return book;
-};
-
 // @desc    Get all books
 // @route   GET /api/books
 export const getBooks = async (req: Request, res: Response) => {
   try {
     const books = await Book.find().populate("user", "username avatar_url").sort("-created_at");
-    const fixedBooks = books.map(book => fixImageUrl(req, book.toObject()));
-    res.json(fixedBooks);
+    res.json(books);
   } catch (error: any) {
     res.status(500).json({ message: "Error fetching books", error: error.message });
   }
@@ -62,8 +48,7 @@ export const getBooks = async (req: Request, res: Response) => {
 export const getMyBooks = async (req: any, res: Response) => {
   try {
     const books = await Book.find({ user: req.user._id }).sort("-created_at");
-    const fixedBooks = books.map(book => fixImageUrl(req, book.toObject()));
-    res.json(fixedBooks);
+    res.json(books);
   } catch (error: any) {
     res.status(500).json({ message: "Error fetching your books", error: error.message });
   }
