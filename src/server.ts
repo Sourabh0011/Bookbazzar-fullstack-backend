@@ -116,12 +116,6 @@ app.use((req, res) => {
   });
 });
 
-// Conditionally listen only if not in production environment (like Vercel)
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
-
-// Export the app for Vercel
-export default app;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
