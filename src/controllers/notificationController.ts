@@ -1,4 +1,4 @@
-import { Response } from "express";
+import type { Response } from "express";
 import Notification from "../models/Notification";
 
 // @desc    Get user notifications

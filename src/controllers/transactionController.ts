@@ -1,4 +1,4 @@
-import { Response } from "express";
+import type { Response } from "express";
 import Transaction from "../models/Transaction";
 import Notification from "../models/Notification";
 import Book from "../models/Book";

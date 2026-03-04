@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import Book from "../models/Book";
 
 // @desc    Create a new book listing

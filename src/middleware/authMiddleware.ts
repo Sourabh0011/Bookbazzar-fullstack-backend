@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
 import User from "../models/User";
 
 export const protect = async (req: any, res: Response, next: NextFunction) => {
