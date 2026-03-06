@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import Book from "../models/Book";
+import Book from "../models/Book.js";
 
 // @desc    Create a new book listing
 // @route   POST /api/books

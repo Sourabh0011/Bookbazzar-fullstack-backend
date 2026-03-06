@@ -1,7 +1,7 @@
 import type { Response } from "express";
-import Transaction from "../models/Transaction";
-import Notification from "../models/Notification";
-import Book from "../models/Book";
+import Transaction from "../models/Transaction.js";
+import Notification from "../models/Notification.js";
+import Book from "../models/Book.js";
 
 // @desc    Create a new transaction
 // @route   POST /api/transactions
